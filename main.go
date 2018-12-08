@@ -26,6 +26,11 @@ type SearchQuery struct {
 	Offset int `json:"offset"`
 }
 
+type SearchResponse struct {
+	Total int `json:"total"`
+	Results []redisearch.Document `json:"results"`
+}
+
 // Handler for search on the index
 func searchHandler(w http.ResponseWriter, r *http.Request){
 	// First, we need to decode post body from the request
@@ -45,7 +50,11 @@ func searchHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	response, err := json.Marshal(docs)
+	searchResponse := &SearchResponse{
+		Total: total,
+		Results: docs,
+	}
+	response, err := json.Marshal(searchResponse)
   if err != nil {
     http.Error(w, err.Error(), http.StatusInternalServerError)
     return
