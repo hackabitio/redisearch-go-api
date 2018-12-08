@@ -22,6 +22,9 @@ const (
 	// Fetch document payloads as well as fields. See documentation for payloads on redisearch.io
 	QueryWithPayloads Flag = 0x10
 
+	// If set, we do not filter stopwords from the query.
+	QueryNoStopwords Flag = 0x20
+
 	// ... more to come!
 	DefaultOffset = 0
 	DefaultNum    = 10
@@ -106,6 +109,9 @@ func (q Query) serialize() redis.Args {
 	}
 	if q.Flags&QueryWithScores != 0 {
 		args = args.Add("WITHSCORES")
+	}
+	if q.Flags&QueryNoStopwords != 0 {
+		args = args.Add("NOSTOPWORDS")
 	}
 
 	if q.InKeys != nil {
