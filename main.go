@@ -14,6 +14,7 @@ var client *redisearch.Client
 func main() {
 	client = redisearch.NewClient("localhost:6379", "")
 	router := chi.NewRouter()
+	router.Get("/info/{idx}", infoHandler)
 	router.Post("/search", searchHandler)
 	http.ListenAndServe(":8080", router)
 }
@@ -53,4 +54,27 @@ func searchHandler(w http.ResponseWriter, r *http.Request){
 	fmt.Println(docs[0].Id, docs[0].Properties["post_title"], total, err)
 
 	w.Write(response)
+}
+
+// Get index info
+func infoHandler(w http.ResponseWriter, r *http.Request){
+	// Get index name from url params
+	indexName := chi.URLParam(r, "idx")
+	// Set index name to the client
+	client.IndexName(indexName)
+	// Get index info. This converts to "FT.INFO <index_name>" command
+	info, err := client.Info()
+	
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
+	indexInfo, err := json.Marshal(info)
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+	}
+	
+	w.Write(indexInfo)
 }
