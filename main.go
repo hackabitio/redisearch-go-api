@@ -22,6 +22,7 @@ func main() {
 type SearchQuery struct {
 	IndexName string `json:"indexName"`
 	Query string `json:"query"`
+	Flags []string `json:"flags"`
 	From int `json:"from"`
 	Offset int `json:"offset"`
 }
@@ -37,9 +38,28 @@ func searchHandler(w http.ResponseWriter, r *http.Request){
 	data := &SearchQuery{}
 	json.NewDecoder(r.Body).Decode(&data)
 	// We set index name
-  client.IndexName(data.IndexName)
+	client.IndexName(data.IndexName)
+	// Create search query and set flags
+	
+	var queryFlags redisearch.Flag = 0x0
+
+	if data.Flags != nil {
+		flags := map[string]redisearch.Flag{
+			"VERBATIM": 0x1,
+			"NOCONTENT": 0x2,
+			"WITHSCORES": 0x4,
+			"INORDER": 0x08,
+			"WITHPAYLOADS": 0x10,
+			"NOSTOPWORDS": 0x20,
+		}
+		for _, f := range data.Flags {
+			queryFlags += flags[f]
+		}
+	}
+
+	query := redisearch.NewQuery(data.Query).Limit(data.From, data.Offset).SetFlags(queryFlags)
 	// Then we do the serach
-	docs, total, err := client.Search(redisearch.NewQuery(data.Query).Limit(data.From, data.Offset))
+	docs, total, err := client.Search(query)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
