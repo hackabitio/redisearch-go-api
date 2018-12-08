@@ -9,30 +9,48 @@ import (
 	"github.com/go-chi/chi"
 )
 
+var client *redisearch.Client
+
 func main() {
-		r := chi.NewRouter()
-	r.Get("/search/{query}", searchHandler)
-	http.ListenAndServe(":8080", r)
+	client = redisearch.NewClient("localhost:6379", "")
+	router := chi.NewRouter()
+	router.Post("/search", searchHandler)
+	http.ListenAndServe(":8080", router)
 }
 
+type SearchQuery struct {
+	IndexName string `json:"indexName"`
+	Query string `json:"query"`
+	From int `json:"from"`
+	Offset int `json:"offset"`
+}
+
+// Handler for search on the index
 func searchHandler(w http.ResponseWriter, r *http.Request){
-	query := chi.URLParam(r, "query")
-	
-	c := redisearch.NewClient("localhost:6379", "myIndex")
-	docs, total, err := c.Search(redisearch.NewQuery(query).Limit(0, 10))
-	
+	// First, we need to decode post body from the request
+	data := &SearchQuery{}
+	json.NewDecoder(r.Body).Decode(&data)
+	// We set index name
+  client.IndexName(data.IndexName)
+	// Then we do the serach
+	docs, total, err := client.Search(redisearch.NewQuery(data.Query).Limit(data.From, data.Offset))
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
-	fmt.Println(docs[0].Id, docs[0].Properties["post_title"], total, err)
+	// If no results, just return an empty map
+	if total == 0 {
+		w.Write([]byte{})
+		return
+	}
 
-	js, err := json.Marshal(docs)
+	response, err := json.Marshal(docs)
   if err != nil {
     http.Error(w, err.Error(), http.StatusInternalServerError)
     return
 	}
 	
-	w.Write(js)
-	
+	fmt.Println(docs[0].Id, docs[0].Properties["post_title"], total, err)
+
+	w.Write(response)
 }
