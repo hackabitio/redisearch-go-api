@@ -65,6 +65,12 @@ func NewClient(addr, name string) *Client {
 	return ret
 }
 
+// Sometimes we create connection pool before recieving index name
+// So we connect to redis first, then this method adds index name to Client
+func (i *Client) IndexName(name string) {
+	i.name = name
+}
+
 // CreateIndex configues the index and creates it on redis
 func (i *Client) CreateIndex(s *Schema) error {
 	args := redis.Args{i.name}
