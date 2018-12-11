@@ -17,6 +17,7 @@ func main() {
 	router.Get("/info/{idx}", infoHandler)
 	router.Post("/search", searchHandler)
 	router.Post("/create", createHandler)
+	router.Delete("/drop/{idx}", dropHandler)
 	http.ListenAndServe(":8080", router)
 }
 
@@ -190,6 +191,25 @@ func createHandler(w http.ResponseWriter, r *http.Request){
 	fmt.Println(newSchema)
 
 	// w.Write(response)
+}
+
+// Drop a certain index
+func dropHandler(w http.ResponseWriter, r *http.Request){
+	// Get index name from url params
+	indexName := chi.URLParam(r, "idx")
+	// Set index name to the client
+	client.IndexName(indexName)
+	// Simply drop the index
+	err := client.Drop()
+	
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
+	dropped, _ := json.Marshal("Index successfully dropped")
+	
+	w.Write(dropped)
 }
 
 // Get index info
