@@ -17,6 +17,7 @@ func main() {
 	router.Get("/info/{idx}", infoHandler)
 	router.Post("/search", searchHandler)
 	router.Post("/create", createHandler)
+	router.Post("/add", addHandler)
 	router.Delete("/drop/{idx}", dropHandler)
 	http.ListenAndServe(":8080", router)
 }
@@ -191,6 +192,36 @@ func createHandler(w http.ResponseWriter, r *http.Request){
 	fmt.Println(newSchema)
 
 	// w.Write(response)
+}
+
+type Document struct {
+	IndexName string `json:"indexName"`
+	Doc redisearch.Document `json:"document"`
+}
+
+// Add document
+func addHandler(w http.ResponseWriter, r *http.Request){
+	// First, decode post body from the request
+	data := &Document{}
+	json.NewDecoder(r.Body).Decode(&data)
+	// Set index name to the client
+	client.IndexName(data.IndexName)
+
+	// Create a document with an id, given score and its fields
+	document := redisearch.NewDocument(data.Doc.Id, data.Doc.Score)
+	for f, v := range data.Doc.Properties {
+		document.Set(f, v)
+	}
+
+	// Index the document
+	if err := client.Index([]redisearch.Document{document}...); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
+	docAdded, _ := json.Marshal("Document added to the index")
+	
+	w.Write(docAdded)
 }
 
 // Drop a certain index
