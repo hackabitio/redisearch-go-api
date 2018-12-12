@@ -22,6 +22,12 @@ func NewAutocompleter(addr, name string) *Autocompleter {
 	}
 }
 
+// Sometimes we create connection pool before recieving index name
+// So we connect to redis first, then this method adds index name to Client
+func (a *Autocompleter) IndexName(name string) {
+	a.name = name
+}
+
 // Delete deletes the Autocompleter key for this AC
 func (a *Autocompleter) Delete() error {
 
