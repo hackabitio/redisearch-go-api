@@ -478,23 +478,50 @@ func (info *IndexInfo) loadSchema(values []interface{}, options []string) {
 		case "NUMERIC":
 			f.Type = NumericField
 			nfOptions := NumericFieldOptions{}
-			f.Options = nfOptions
+			f.Options = &nfOptions
 			if sliceIndex(options, "SORTABLE") != -1 {
 				nfOptions.Sortable = true
+				f.Sortable = true
+			}
+			if sliceIndex(options, "NOINDEX") != -1 {
+				nfOptions.NoIndex = true
+				f.Sortable = true
 			}
 		case "TEXT":
 			f.Type = TextField
 			tfOptions := TextFieldOptions{}
-			f.Options = tfOptions
+			f.Options = &tfOptions
 			if sliceIndex(options, "SORTABLE") != -1 {
 				tfOptions.Sortable = true
+				f.Sortable = true
+			}
+			if sliceIndex(options, "NOSTEM") != -1 {
+				tfOptions.NoStem = true
+			}
+			if sliceIndex(options, "NOINDEX") != -1 {
+				tfOptions.NoIndex = true
 			}
 			if wIdx := sliceIndex(options, "WEIGHT"); wIdx != -1 && wIdx+1 != len(spec) {
 				weightString := options[wIdx+1]
 				weight64, _ := strconv.ParseFloat(weightString, 32)
 				tfOptions.Weight = float32(weight64)
 			}
+		case "TAG":
+			f.Type = TagField
+			tgfOptions := TagFieldOptions{}
+			f.Options = &tgfOptions
+			if sliceIndex(options, "SORTABLE") != -1 {
+				tgfOptions.Sortable = true
+				f.Sortable = true
+			}
+			if sliceIndex(options, "NOINDEX") != -1 {
+				tgfOptions.NoIndex = true
+			}
+			if separator := sliceIndex(options, "SEPARATOR"); separator != -1 {
+				tgfOptions.Separator = []byte(options[separator+1])[0]
+			}
 		}
+		fmt.Println(f)
 		sc = sc.AddField(f)
 	}
 	info.Schema = *sc
