@@ -11,10 +11,10 @@ type Suggestion struct {
 
 // SuggestOptions are options which are passed when recieving suggestions from the Autocompleter
 type SuggestOptions struct {
-	Num          int
-	Fuzzy        bool
-	WithPayloads bool
-	WithScores   bool
+	Num          int		`json:"number"`
+	Fuzzy        bool		`json:"fuzzy"`
+	WithPayloads bool		`json:"withPayloads"`
+	WithScores   bool		`json:"withScores"`
 }
 
 // SuggestionList is a sortable list of suggestions returned from an engine
