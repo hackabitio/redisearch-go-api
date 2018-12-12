@@ -21,6 +21,7 @@ func main() {
 	router.Delete("/drop/{idx}", dropHandler)
 	router.Route("/suggestion", func(r chi.Router) {
 		r.Post("/add", addSuggestion)
+		r.Post("/get", getSuggestion)
 	})
 	http.ListenAndServe(":8080", router)
 }
@@ -296,6 +297,38 @@ func addSuggestion(w http.ResponseWriter, r *http.Request){
 	}
 	
 	added, _ := json.Marshal("Suggestion added")
+	
+	w.Write(added)
+}
+
+type Suggest struct {
+	IndexName string `json:"name"`
+	Prefix string `json:"prefix"`
+	Options redisearch.SuggestOptions `json:"options"`
+}
+// Add suggestion/autocomplete
+func getSuggestion(w http.ResponseWriter, r *http.Request){
+	// First, decode post body from the request
+	data := &Suggest{}
+	json.NewDecoder(r.Body).Decode(&data)
+	// Create new connection pool
+	autocompleter := redisearch.NewAutocompleter("localhost:6379", "")
+	// If suggestion index name is not available in the request, return error
+	if data.IndexName == "" {
+		http.Error(w, "Suggestion index name is not provided", http.StatusBadRequest)
+		return
+	}
+	// Set index name to the client
+	autocompleter.IndexName(data.IndexName)
+	// The get suggestion
+	sugg, err := autocompleter.SuggestOpts(data.Prefix, data.Options)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
+	added, _ := json.Marshal(sugg)
 	
 	w.Write(added)
 }
