@@ -22,7 +22,7 @@ type handler struct {
 func New(client *redisearch.Client) chi.Router {
 	h := handler{client}
 	router := chi.NewRouter()
-	// router.Get("/info/{idx}", requestHandler(h.Info))
+	router.Get("/info/{idx}", requestHandler(h.Info))
 	// router.Post("/search", requestHandler(h.Search))
 
 	// router.Post("/create", createHandler)
