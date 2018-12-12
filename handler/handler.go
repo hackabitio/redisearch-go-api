@@ -25,7 +25,7 @@ func New(client *redisearch.Client) chi.Router {
 	router.Get("/info/{idx}", requestHandler(h.Info))
 	router.Post("/search", requestHandler(h.Search))
 	router.Post("/create", requestHandler(h.Create))
-	// router.Post("/add", requestHandler(h.Add))
+	router.Post("/add", requestHandler(h.Add))
 
 	// router.Delete("/drop/{idx}", dropHandler)
 	// router.Route("/suggestion", func(r chi.Router) {
