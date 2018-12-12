@@ -3,6 +3,7 @@ package redisearch
 import (
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -400,7 +401,9 @@ func (info *IndexInfo) setTarget(key string, value interface{}) error {
 				targetInfo.SetUint(u)
 			case reflect.Float64:
 				f, _ := redis.Float64(value, nil)
-				targetInfo.SetFloat(f)
+				if !math.IsNaN(f) {
+					targetInfo.SetFloat(f)
+				}
 			default:
 				panic("Tag set without handler")
 			}
