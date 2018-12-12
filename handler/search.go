@@ -51,12 +51,12 @@ func (h handler) Search(w io.Writer, r *http.Request) (interface{}, int, error) 
 	// Then we do the serach
 	docs, total, err := h.client.Search(query)
 	if err != nil {
-		return nil, 500, err
+		return nil, http.StatusInternalServerError, err
 	}
 	// If no results, just return an empty map
 	if total == 0 {
 		w.Write([]byte{})
-		return nil, 500, err
+		return nil, http.StatusInternalServerError, err
 	}
 
 	searchResponse := &SearchResponse{
@@ -66,5 +66,5 @@ func (h handler) Search(w io.Writer, r *http.Request) (interface{}, int, error) 
 	
 	fmt.Println(docs[0].Id, docs[0].Properties["post_title"], total, err)
 
-	return searchResponse, 200, nil
+	return searchResponse, http.StatusOK, nil
 }
