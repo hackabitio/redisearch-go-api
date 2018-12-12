@@ -24,9 +24,9 @@ func New(client *redisearch.Client) chi.Router {
 	router := chi.NewRouter()
 	router.Get("/info/{idx}", requestHandler(h.Info))
 	router.Post("/search", requestHandler(h.Search))
+	router.Post("/create", requestHandler(h.Create))
+	// router.Post("/add", requestHandler(h.Add))
 
-	// router.Post("/create", createHandler)
-	// router.Post("/add", addHandler)
 	// router.Delete("/drop/{idx}", dropHandler)
 	// router.Route("/suggestion", func(r chi.Router) {
 	// 	r.Post("/add", addSuggestion)
@@ -44,6 +44,7 @@ func requestHandler(h func(io.Writer, *http.Request) (interface{}, int, error)) 
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(status)
+		fmt.Println(data)
 
 		err = json.NewEncoder(w).Encode(response{Data: data, Success: err == nil})
 		if err != nil {
