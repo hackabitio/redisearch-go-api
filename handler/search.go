@@ -55,7 +55,6 @@ func (h handler) Search(w io.Writer, r *http.Request) (interface{}, int, error) 
 	}
 	// If no results, just return an empty map
 	if total == 0 {
-		w.Write([]byte{})
 		return nil, http.StatusInternalServerError, err
 	}
 
