@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"io"
 	"encoding/json"
+
+	"github.com/7kmCo/redisearch-go-api/redisearch"
 )
 
 
@@ -11,9 +13,8 @@ import (
 func (h handler) SynAdd(w io.Writer, r *http.Request) (interface{}, int, error) {
 	// First, decode post body from the request
 	data := &struct{
-		IndexName 	string	`json:"indexName"`
-		Term 				string	`json:"term"`
-		Synonym			string `json:"synonym"`
+		IndexName 	string								`json:"indexName"`
+		SynGroup		[]redisearch.SynGroup	`json:"synonymGroup"`
 	}{}
 	json.NewDecoder(r.Body).Decode(&data)
 	// If suggestion index name is not available in the request, return error
@@ -23,7 +24,7 @@ func (h handler) SynAdd(w io.Writer, r *http.Request) (interface{}, int, error) 
 	// Set index name to the client
 	h.client.IndexName(data.IndexName)
 	
-	_, err := h.client.SynAdd(data.Term, data.Synonym)
+	_, err := h.client.SynBulk(data.SynGroup)
 
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
