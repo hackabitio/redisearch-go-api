@@ -28,8 +28,8 @@ func (a *Autocompleter) IndexName(name string) {
 	a.name = name
 }
 
-// Delete deletes the Autocompleter key for this AC
-func (a *Autocompleter) Delete() error {
+// Drop deletes the Autocompleter key for this AC
+func (a *Autocompleter) Drop() error {
 
 	conn := a.pool.Get()
 	defer conn.Close()
