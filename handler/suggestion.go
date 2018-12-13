@@ -14,7 +14,7 @@ type Suggestion struct {
 }
 
 // Add suggestion/autocomplete
-func (h handler) SuggAdd(w io.Writer, r *http.Request) (interface{}, int, error) {
+func (h handler) SugAdd(w io.Writer, r *http.Request) (interface{}, int, error) {
 	// First, decode post body from the request
 	data := &Suggestion{}
 	json.NewDecoder(r.Body).Decode(&data)
