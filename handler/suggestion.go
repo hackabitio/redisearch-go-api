@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/7kmCo/redisearch-go-api/redisearch"
+	"github.com/go-chi/chi"
 )
 
 type Suggestion struct {
@@ -89,4 +90,23 @@ func (h handler) SugDel(w io.Writer, r *http.Request) (interface{}, int, error) 
 	}
 	
 	return "String deleted", http.StatusOK, nil
+}
+
+// Gets number of terms in suggestion index
+func (h handler) SugLen(w io.Writer, r *http.Request) (interface{}, int, error) {
+	// Get index name from url params
+	indexName := chi.URLParam(r, "idx")
+	// Create new connection pool
+	autocompleter := redisearch.NewAutocompleter("localhost:6379", "")
+	
+	// Set index name to the client
+	autocompleter.IndexName(indexName)
+	// Delete suggestion from index
+	len, err := autocompleter.SugLen()
+
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	return len, http.StatusOK, nil
 }
