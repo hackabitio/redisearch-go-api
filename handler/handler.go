@@ -30,6 +30,7 @@ func New(client *redisearch.Client) chi.Router {
 	router.Route("/suggestion", func(r chi.Router) {
 		r.Post("/add", requestHandler(h.SuggAdd))
 		r.Post("/get", requestHandler(h.SugGet))
+		r.Delete("/delete", requestHandler(h.SugDel))
 	})
 	http.ListenAndServe(":8080", router)
 	return router

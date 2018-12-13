@@ -55,7 +55,7 @@ func (h handler) SugGet(w io.Writer, r *http.Request) (interface{}, int, error) 
 	}
 	// Set index name to the client
 	autocompleter.IndexName(data.IndexName)
-	// The get suggestion
+	// Then get suggestion
 	sugg, err := autocompleter.SuggestOpts(data.Prefix, data.Options)
 
 	if err != nil {
@@ -63,4 +63,30 @@ func (h handler) SugGet(w io.Writer, r *http.Request) (interface{}, int, error) 
 	}
 	
 	return sugg, http.StatusOK, nil
+}
+
+// Deletes a string from suggestion/autocomplete
+func (h handler) SugDel(w io.Writer, r *http.Request) (interface{}, int, error) {
+	// First, decode post body from the request
+	data := &struct{
+		IndexName 	string	`json:"name"`
+		Prefix 			string	`json:"text"`
+	}{}
+	json.NewDecoder(r.Body).Decode(&data)
+	// Create new connection pool
+	autocompleter := redisearch.NewAutocompleter("localhost:6379", "")
+	// If suggestion index name is not available in the request, return error
+	if data.IndexName == "" {
+		return nil, http.StatusInternalServerError, nil
+	}
+	// Set index name to the client
+	autocompleter.IndexName(data.IndexName)
+	// Delete suggestion from index
+	err := autocompleter.Delete(data.Prefix)
+
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	
+	return "String deleted", http.StatusOK, nil
 }
