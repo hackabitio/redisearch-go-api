@@ -1,6 +1,6 @@
 package redisearch
 
-import (
+import (	
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -22,8 +22,25 @@ func (i *Client) SynAdd(term, syn string) (bool, error) {
 	return true, nil
 }
 
-	if err != nil {
-		return false, err
+type SynGroup struct {
+	Term		string
+	Synonym	string
+}
+// Add synonym group to the index
+func (i *Client) SynBulk(synGroup []SynGroup) (bool, error) {
+	conn := i.pool.Get()
+	defer conn.Close()
+
+	args := redis.Args{i.name}
+
+	for _, group := range synGroup {
+		args = append(args, group.Term, group.Synonym)
+	
+		err := conn.Send("FT.SYNADD", args...)
+	
+		if err != nil {
+			return false, err
+		}
 	}
 
 	return true, nil
