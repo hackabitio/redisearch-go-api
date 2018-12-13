@@ -28,13 +28,23 @@ func (a *Autocompleter) IndexName(name string) {
 	a.name = name
 }
 
-// Drop deletes the Autocompleter key for this AC
+// Drop, deletes the Autocompleter key for this AC
 func (a *Autocompleter) Drop() error {
 
 	conn := a.pool.Get()
 	defer conn.Close()
 
 	_, err := conn.Do("DEL", a.name)
+	return err
+}
+
+// Delete, deletes a string from a suggestion index
+func (a *Autocompleter) Delete(prefix string) error {
+
+	conn := a.pool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("FT.SUGDEL", a.name, prefix)
 	return err
 }
 
