@@ -10,7 +10,7 @@ import (
 
 type Suggestion struct {
 	IndexName string `json:"name"`
-	Sugg redisearch.Suggestion `json:"suggestion"`
+	Sugg []redisearch.Suggestion `json:"suggestion"`
 }
 
 // Add suggestion/autocomplete
@@ -27,7 +27,7 @@ func (h handler) SuggAdd(w io.Writer, r *http.Request) (interface{}, int, error)
 	// Set index name to the client
 	autocompleter.IndexName(data.IndexName)
 	
-	err := autocompleter.AddTerms(data.Sugg)
+	err := autocompleter.AddTerms(data.Sugg ...)
 
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
