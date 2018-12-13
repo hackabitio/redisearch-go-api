@@ -160,3 +160,17 @@ func (a *Autocompleter) SuggestOpts(prefix string, opts SuggestOptions) ([]Sugge
 	return ret, nil
 
 }
+
+// SuggLen gets number of terms in suggestion index
+func (a *Autocompleter) SugLen() (int64, error) {
+	conn := a.pool.Get()
+	defer conn.Close()
+
+	len, err := conn.Do("FT.SUGLEN", a.name)
+	
+	if err != nil {
+		return 0, err
+	}
+	
+	return len.(int64), nil
+}
