@@ -1,8 +1,6 @@
 package redisearch
 
 import (
-	"fmt"
-	
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -15,8 +13,15 @@ func (i *Client) SynAdd(term, syn string) (bool, error) {
 	args := redis.Args{i.name}
 	args = append(args, term, syn)
 
-	res, err := conn.Do("FT.SYNADD", args...)
-	fmt.Printf("Type: %T, value: %v", res, res)
+	err := conn.Send("FT.SYNADD", args...)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 	if err != nil {
 		return false, err
 	}
