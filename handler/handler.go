@@ -33,6 +33,10 @@ func New(client *redisearch.Client) chi.Router {
 		r.Post("/get", requestHandler(h.SugGet))
 		r.Delete("/delete", requestHandler(h.SugDel))
 	})
+	// Router group for synonyms
+	router.Route("/synonym", func(r chi.Router) {
+		r.Post("/add", requestHandler(h.SynAdd))
+	})
 	http.ListenAndServe(":8080", router)
 	return router
 }
