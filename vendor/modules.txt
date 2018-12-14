@@ -1,5 +1,7 @@
 # github.com/go-chi/chi v3.3.3+incompatible
 github.com/go-chi/chi
+# github.com/go-chi/cors v1.0.0
+github.com/go-chi/cors
 # github.com/gomodule/redigo v2.0.0+incompatible
 github.com/gomodule/redigo/redis
 github.com/gomodule/redigo/internal

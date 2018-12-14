@@ -8,6 +8,7 @@ import (
 
 	"github.com/7kmCo/redisearch-go-api/redisearch"
 	"github.com/go-chi/chi"	
+	"github.com/go-chi/cors"
 )
 
 type response struct {
@@ -22,6 +23,20 @@ type handler struct {
 func New(client *redisearch.Client) chi.Router {
 	h := handler{client}
 	router := chi.NewRouter()
+
+	// Basic CORS
+  cors := cors.New(cors.Options{
+    // AllowedOrigins: []string{"https://foo.com"}, // Use this to allow specific origin hosts
+    AllowedOrigins:   []string{"*"},
+    AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+    AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+    ExposedHeaders:   []string{"Link"},
+    AllowCredentials: true,
+    MaxAge:           300, // Maximum value not ignored by any of major browsers
+		Debug:            true,
+  })
+	router.Use(cors.Handler)
+	
 	router.Get("/info/{idx}", requestHandler(h.Info))
 	router.Post("/search", requestHandler(h.Search))
 	router.Post("/create", requestHandler(h.Create))
