@@ -336,7 +336,6 @@ func (i *Client) Search(q *Query) (docs []Document, total int, err error) {
 
 	if len(res) > skip {
 		for i := 1; i < len(res); i += skip {
-
 			if d, e := loadDocument(res, i, scoreIdx, payloadIdx, fieldsIdx); e == nil {
 				docs = append(docs, d)
 			} else {
@@ -374,7 +373,8 @@ type DelDoc struct {
 	DD 					bool 		`json:"dd"`
 }
 
-// Drop the  Currentl just flushes the DB - note that this will delete EVERYTHING on the redis instance
+// Delete document from index. If DD is set to true,
+// will make RediSearch also delete the actual document if it is in the index.
 func (i *Client) Delete(d *DelDoc) error {
 	conn := i.pool.Get()
 	defer conn.Close()
