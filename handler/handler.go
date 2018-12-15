@@ -40,6 +40,7 @@ func New(client *redisearch.Client) chi.Router {
 	router.Get("/info/{idx}", requestHandler(h.Info))
 	router.Post("/explain", requestHandler(h.Explain))
 	router.Post("/search", requestHandler(h.Search))
+	router.Get("/get/{idx}/{docId}", requestHandler(h.Get))
 	router.Post("/create", requestHandler(h.Create))
 	router.Post("/add", requestHandler(h.Add))
 	router.Delete("/drop/{idx}", requestHandler(h.Drop))
