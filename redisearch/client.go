@@ -368,6 +368,28 @@ func (i *Client) Drop() error {
 
 }
 
+type DelDoc struct {
+	IndexName 	string 	`json:"indexName"`
+	DocId 			string 	`json:"docId"`
+	DD 					bool 		`json:"dd"`
+}
+
+// Drop the  Currentl just flushes the DB - note that this will delete EVERYTHING on the redis instance
+func (i *Client) Delete(d *DelDoc) error {
+	conn := i.pool.Get()
+	defer conn.Close()
+
+	args := redis.Args{i.name}
+	args = append(args, d.DocId)
+	if d.DD {
+		args = append(args, "DD")
+	}
+
+	_, err := conn.Do("FT.DEL", args...)
+	return err
+
+}
+
 // IndexInfo - Structure showing information about an existing index
 type IndexInfo struct {
 	Schema               Schema
