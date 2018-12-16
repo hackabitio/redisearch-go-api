@@ -55,6 +55,7 @@ func New(client *redisearch.Client) chi.Router {
 	router.Route("/synonym", func(r chi.Router) {
 		r.Post("/add", requestHandler(h.SynAdd))
 	})
+	router.Post("/spellcheck", requestHandler(h.Check))
 	http.ListenAndServe(":8080", router)
 	return router
 }
