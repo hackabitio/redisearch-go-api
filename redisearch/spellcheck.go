@@ -7,13 +7,13 @@ import (
 )
 
 type SpellCheck struct {
-	Term 					string 					`json:"term"`
-	Suggestions 	[]SpellSuggestions		`json:"suggestions"`
+	Term 					string 			`json:"term"`
+	Suggestions 	[]Suggs			`json:"suggestions"`
 }
 
-type SpellSuggestions struct {
-	Suggestion 	string `json:"suggestion"`
-	Distance 		float64 `json:"distance"`
+type Suggs struct {
+	Suggestion 		string 			`json:"suggestion"`
+	Distance 			float64 		`json:"distance"`
 }
 
 // SpellCheck, Performs spelling correction on a query,
@@ -34,21 +34,21 @@ func (i *Client) SpellCheck(q *Query) (suggestions []SpellCheck, total int, err 
 	sugg := make([]SpellCheck, 0, len(res))
 	// Prepare the document to be returned
 		for _, v := range res {
-			sugg = append(sugg, loadTerms(v.([]interface{})))
+			sugg = append(sugg, prepareSuggestions(v.([]interface{})))
 		}
 
 	return sugg, 1, err
 }
 
-
-func loadTerms(arr []interface{}) (SpellCheck) {
+// Prepare Spell Check suggestions
+func prepareSuggestions(arr []interface{}) (SpellCheck) {
 	sugg := SpellCheck{}
 	sugg.Term = string(arr[1].([]uint8))
 	
 	for _, vv := range arr {
 		switch vv.(type) {
 		case []interface{}:
-			s := SpellSuggestions{}
+			s := Suggs{}
 			for _, sv := range vv.([]interface{}) {
 				s.Suggestion = string(sv.([]interface{})[1].([]uint8))
 				sd, _ := strconv.ParseFloat(string(sv.([]interface{})[0].([]uint8)), 32)
@@ -57,5 +57,6 @@ func loadTerms(arr []interface{}) (SpellCheck) {
 			}
 		}
 	}
+	
 	return sugg
 }
