@@ -31,6 +31,7 @@ type TextFieldOptions struct {
 	Sortable bool
 	NoStem   bool
 	NoIndex  bool
+	Phonetic string
 }
 
 // TagFieldOptions options for indexing tag fields
