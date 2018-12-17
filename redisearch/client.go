@@ -154,6 +154,17 @@ func (i *Client) CreateIndex(s *Schema) error {
 					args = append(args, "NOINDEX")
 				}
 			}
+		case GeoField:
+			args = append(args, f.Name, "GEO")
+			if f.Options != nil {
+				opts, ok := f.Options.(GeoFieldOptions)
+				if !ok {
+					return errors.New("Invalid geo field options type")
+				}
+				if opts.NoIndex {
+					args = append(args, "NOINDEX")
+				}
+			}
 		default:
 			return fmt.Errorf("Unsupported field type %v", f.Type)
 		}
@@ -541,6 +552,13 @@ func (info *IndexInfo) loadSchema(values []interface{}, options []string) {
 			}
 			if separator := sliceIndex(options, "SEPARATOR"); separator != -1 {
 				tgfOptions.Separator = []byte(options[separator+1])[0]
+			}
+		case "GEO":
+			f.Type = GeoField
+			geofOptions := GeoFieldOptions{}
+			f.Options = &geofOptions
+			if sliceIndex(options, "NOINDEX") != -1 {
+				geofOptions.NoIndex = true
 			}
 		}
 		fmt.Println(f)
