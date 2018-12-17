@@ -58,6 +58,9 @@ func (h handler) Create(w io.Writer, r *http.Request) (interface{}, int, error) 
 					if sc.Options["noIndex"] != nil {
 						textFieldOptions.NoIndex = sc.Options["noIndex"].(bool)
 					}
+					if sc.Options["phonetic"] != nil {
+						textFieldOptions.Phonetic = sc.Options["phonetic"].(string)
+					}
 					newSchema.AddField(redisearch.NewTextFieldOptions(sc.Name, textFieldOptions))
 				} else {
 					// If there are no options with field schema,

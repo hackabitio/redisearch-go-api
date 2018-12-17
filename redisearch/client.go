@@ -119,6 +119,10 @@ func (i *Client) CreateIndex(s *Schema) error {
 				if opts.NoIndex {
 					args = append(args, "NOINDEX")
 				}
+
+				if opts.Phonetic != "" {
+					args = append(args, "PHONETIC", opts.Phonetic)
+				}
 			}
 
 		case NumericField:
