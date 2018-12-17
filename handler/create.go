@@ -102,6 +102,22 @@ func (h handler) Create(w io.Writer, r *http.Request) (interface{}, int, error) 
 					// Tag field with default options
 					newSchema.AddField(redisearch.NewTagField(sc.Name))
 				}
+
+
+			// Geo field
+			case "geo":
+				// If any options provided, do the validations here
+				if sc.Options != nil {
+					var geoFieldOptions redisearch.GeoFieldOptions
+					if sc.Options["noIndex"] != nil {
+						geoFieldOptions.NoIndex = sc.Options["noIndex"].(bool)
+					}
+					newSchema.AddField(redisearch.NewGeoFieldOptions(sc.Name, geoFieldOptions))
+				} else {
+					// numeric field with default options
+					newSchema.AddField(redisearch.NewGeoField(sc.Name))
+				}
+
 		}
 
 	}
